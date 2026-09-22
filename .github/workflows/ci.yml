@@ -4,7 +4,9 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+    # Intentionally no `branches:` filter: this repo stacks feature branches
+    # (e.g. a PR into docs/phase0-architecture before that itself merges to
+    # main), and CI must run on those too, not just PRs targeting main.
 
 permissions:
   contents: read

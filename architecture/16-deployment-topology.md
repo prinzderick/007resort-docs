@@ -51,23 +51,24 @@ flowchart TB
 
 ```mermaid
 flowchart LR
-  subgraph CloudEnv["Cloud environment"]
-    CAPI["007resort-api (Cloud mode)<br/>container/App Service"]
-    CDB[("Managed MySQL 8.4")]
+  subgraph CloudEnv["Cloud environment (budget shared hosting to start — ADR-0010)"]
+    CAPI["007resort-api (Cloud mode)<br/>IIS / ASP.NET Core Module"]
+    CDB[("Shared-host MySQL")]
     BW["007resort-booking-web"]
     AWc["007resort-admin-web (remote instance)"]
-    LB["TLS-terminating load balancer / WAF"]
+    TLS["Host-provided TLS (e.g. Let's Encrypt)"]
   end
-  Customer((Customer browser)) --> LB --> BW --> CAPI
-  Remote((Owner/Manager/Accounts, remote)) --> LB --> AWc --> CAPI
-  PSP["Payment provider"] -- signed webhook --> LB --> CAPI
+  Customer((Customer browser)) --> TLS --> BW --> CAPI
+  Remote((Owner/Manager/Accounts, remote)) --> TLS --> AWc --> CAPI
+  PSP["Paystack"] -- signed webhook --> TLS --> CAPI
   CAPI --> CDB
   Site["Site API"] == outbound sync ==> CAPI
 ```
 
-- The exact managed hosting provider is **not yet selected** — the spec leaves this to "final hosting budget and operational requirements" ([spec §13](../spec/)). This topology is provider-agnostic (works on any environment offering a container/VM runtime, managed MySQL, and a TLS-terminating edge). Provider selection is tracked as an open question ([20](20-open-questions.md)).
+- **Starting tier ([ADR-0010](../adr/0010-cloud-hosting-platform.md)):** a budget Windows/.NET-capable shared hosting plan (e.g. SmarterASP.NET or equivalent), chosen for cost. No dedicated load balancer/WAF or private network path at this tier — the host's own TLS and firewalling stand in for those, which is an accepted trade-off, not an oversight. Confirm the plan's MySQL version and WebSocket support before relying on either.
+- **Upgrade path:** Microsoft Azure (App Service + Azure Database for MySQL Flexible Server + Key Vault + Front Door) once traffic, secret-management needs, or DR requirements outgrow shared hosting ([ADR-0010](../adr/0010-cloud-hosting-platform.md)). This topology was written to be portable across either tier — moving up is a deployment change, not a redesign.
 - The site's local MySQL is **never** exposed to the internet, directly or via port-forward; only the outbound sync/admin channel exists ([spec §20, §21](../spec/)).
-- Cloud `007resort-admin-web` and `007resort-booking-web` reach `007resort-api` (Cloud mode) over a private network path within the cloud environment, not over the public internet, where the hosting provider supports it.
+- Cloud `007resort-admin-web` and `007resort-booking-web` reach `007resort-api` (Cloud mode) over whatever internal path the hosting tier offers (a private network path once on a full cloud platform; likely just an internal hostname/loopback on shared hosting where both run on the same box).
 
 ## 3. Environments
 

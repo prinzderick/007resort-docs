@@ -1,8 +1,8 @@
 # ADR-0009: Payment provider — Paystack primary, behind a provider adapter
 
-Status: Proposed
+Status: Accepted
 Date: 2026-09-22
-Deciders: Engineering recommendation, pending confirmation from the client's accounts/finance stakeholders (see Consequences)
+Deciders: 007 Resort & Spa (owner), engineering recommendation
 
 ## Problem
 

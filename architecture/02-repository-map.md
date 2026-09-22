@@ -4,10 +4,10 @@ All repositories are **private** under `github.com/prinzderick`. `main` is prote
 
 | Repository | Stack | Owns | Must NOT |
 | --- | --- | --- | --- |
-| `007resort-api` | .NET 10, ASP.NET Core, MySQL 8.4 | Schema and migrations, all business rules, authN/authZ, audit, idempotency, sync, SignalR hubs, payment provider integration and webhooks, OpenAPI contract | Contain UI |
+| `007resort-api` | **Laravel (PHP 8.4+), MySQL 8.4, Redis** — deployed as two nodes (Local, Cloud) from this one codebase ([ADR-0012](../adr/0012-migrate-backend-to-laravel.md), [ADR-0013](../adr/0013-dual-node-local-cloud-sync.md)). A verified MySQL migration and a reference (unmerged) ASP.NET Core implementation exist at the `pre-laravel-migration-2026-09-22` tag — see [21](21-existing-system-audit.md) | Schema and migrations, all business rules, authN/authZ, audit, idempotency, sync (outbox/inbox), real-time broadcasting, payment provider integration and webhooks, OpenAPI contract | Contain UI |
 | `007resort-pos-desktop` | .NET 10 WPF | Terminal UX, device drivers behind interfaces, encrypted emergency queue, receipt rendering from API data | Hold a database. Calculate prices, tax, discounts or stock. Decide authorization |
 | `007resort-mobile` | Flutter (Android) | Attendant, supervisor, Sports Entrance and Sports Store UX. Tablet checkout UX. QR scanning | Re-implement validation, pricing or permission logic |
-| `007resort-kds` | TypeScript, Vite, SignalR JS | Station boards, status transition requests, bump UX | Hold payment, pricing or inventory logic |
+| `007resort-kds` | TypeScript, Vite, real-time client (Echo/Reverb) | Station boards, status transition requests, bump UX | Hold payment, pricing or inventory logic |
 | `007resort-admin-web` | Laravel (PHP 8.4+) | Management UI, reports, configuration screens, approval queues | Own business tables. Write to the operational DB. Perform financial or stock operations directly |
 | `007resort-booking-web` | Laravel (PHP 8.4+) | Public site, customer portal, booking UX, payment redirect UX | Contain booking or availability logic. Receive payment webhooks |
 | `007resort-infrastructure` | Compose, PowerShell, YAML | Environment templates, network design, deployment and backup scripts, runbooks | Contain secrets or production credentials |

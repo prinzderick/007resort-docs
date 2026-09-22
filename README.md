@@ -20,7 +20,7 @@ Architecture, API contracts, workflows, Architecture Decision Records (ADRs), op
 
 | Repository | Stack | Responsibility |
 | --- | --- | --- |
-| `007resort-api` | ASP.NET Core / C# | The business engine. Owns the MySQL schema and migrations, business rules, authentication and authorization, sync and integrations |
+| `007resort-api` | Laravel / PHP 8.4+ ([ADR-0012](adr/0012-migrate-backend-to-laravel.md)), deployed as two nodes (Local + Cloud, [ADR-0013](adr/0013-dual-node-local-cloud-sync.md)) | The business engine. Owns the MySQL schema and migrations, business rules, authentication and authorization, sync and integrations |
 | `007resort-pos-desktop` | C# / .NET (WPF) | One configurable Windows POS for all 10 fixed terminals |
 | `007resort-mobile` | Flutter / Dart | Android app for 18 tablets: attendants, supervisors, Sports Entrance, Sports Store |
 | `007resort-admin-web` | PHP / Laravel | Owner, management, accounts, IT, reporting and configuration portal |

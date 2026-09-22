@@ -1,8 +1,10 @@
 # ADR-0010: Cloud hosting platform — budget Windows/.NET shared hosting to start
 
-Status: Accepted
-Date: 2026-09-22
+Status: Superseded by [ADR-0014](0014-cloud-node-requires-vps-supersedes-shared-hosting.md)
+Date: 2026-09-22 (superseded same day, once the dual-node Laravel architecture was decided)
 Deciders: 007 Resort & Spa (owner), engineering recommendation
+
+> **Superseded.** This ADR was written for a single ASP.NET Core Cloud-mode instance, before the dual-node Laravel architecture ([ADR-0012](0012-migrate-backend-to-laravel.md), [ADR-0013](0013-dual-node-local-cloud-sync.md)) was decided. That architecture needs root-level control (queue workers, real-time broadcasting, process supervision) that shared hosting cannot provide, so the owner's follow-up instruction requires a VPS instead — see [ADR-0014](0014-cloud-node-requires-vps-supersedes-shared-hosting.md). Kept below as the historical record of the original reasoning.
 
 ## Problem
 

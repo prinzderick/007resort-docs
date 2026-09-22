@@ -2,15 +2,17 @@
 
 Status: **DRAFT, awaiting review** · Source requirements: [`spec/`](../spec/) (v1.0, September 2026) and the engineering brief.
 
+> **Backend update:** the backend is now **Laravel/PHP + MySQL 8.4 + Redis**, running as **two nodes** (Local, on the property's Windows Server; Cloud, on a VPS), synchronized by transactional events — see [ADR-0012](../adr/0012-migrate-backend-to-laravel.md) and [ADR-0013](../adr/0013-dual-node-local-cloud-sync.md). This document's domain principles (below) are unchanged by that decision; its technology table (§6) and the local-first framing (§3, §12) are updated accordingly. [12](12-sync-strategy.md) and [13](13-offline-strategy.md) are superseded by the dual-node sync design in `sync/`.
+
 ## 1. What we are building
 
 A single platform that runs a multi-facility leisure property: payments, POS, hospitality orders, KDS, inventory, bookings, tickets, memberships, staff identity, attendance, management reporting and a public booking website. It must **keep operating when the internet is down**, and it must be able to take on more facilities, more sites and, later, a hotel PMS module without a rebuild.
 
 ## 2. Guiding principles
 
-1. **One brain.** The ASP.NET Core API is the only component that runs business rules and the only one that writes operational data. Clients display data, collect input and call the API. ([ADR-0001](../adr/0001-api-is-the-single-business-engine.md))
+1. **One brain.** The Laravel API is the only component that runs business rules and the only one that writes operational data. Clients display data, collect input and call the API. ([ADR-0001](../adr/0001-api-is-the-single-business-engine.md), reaffirmed for Laravel by [ADR-0012](../adr/0012-migrate-backend-to-laravel.md))
 2. **Configure, don't hardcode.** Facilities are data. A facility's behaviour comes from its enabled **capabilities** and **operating rules**, not from facility-specific code paths. ([05](05-facility-capability-model.md))
-3. **Local first.** Every critical operation runs against the on-site server over the LAN. The cloud handles remote access, the public website, online booking, backup and disaster recovery. ([12](12-sync-strategy.md), [13](13-offline-strategy.md))
+3. **Local first.** Every critical operation runs against the on-site server over the LAN. The cloud handles remote access, the public website, online booking, backup and disaster recovery. (Now [ADR-0013](../adr/0013-dual-node-local-cloud-sync.md) and `sync/`, superseding [12](12-sync-strategy.md)/[13](13-offline-strategy.md))
 4. **Money is immutable.** Payments, refunds and reversals are append-only facts. Corrections are new records, never edits.
 5. **The database enforces invariants.** Double booking, double redemption, duplicate payments and negative stock races are blocked by constraints and atomic conditional updates. Client-side checks are convenience only.
 6. **Everything sensitive is audited**, including the approver where one is required.
@@ -118,17 +120,18 @@ The modules talk to each other inside one database transaction when the change m
 
 | Area | Choice | Status |
 | --- | --- | --- |
-| Business API | ASP.NET Core on .NET 10 (LTS), C# | Mandated by spec |
-| Database | MySQL 8.4 LTS, InnoDB, utf8mb4 | Mandated by spec |
-| Real-time | ASP.NET Core SignalR (WebSockets) | Mandated by spec |
-| Caching / transient coordination | Redis, only where justified. Not needed for correctness | Spec |
-| POS | .NET 10 WPF on Windows | [ADR-0006](../adr/0006-client-technology-choices.md) (proposed) |
-| Mobile | Flutter (Android) | Mandated |
-| Admin / Booking web | Laravel (PHP 8.4+) as a UI/BFF with **no business database** | [ADR-0007](../adr/0007-php-apps-are-api-clients-without-business-data.md) (proposed) |
-| KDS | Browser kiosk client (TypeScript, SignalR JS) | [ADR-0006](../adr/0006-client-technology-choices.md) (proposed) |
-| Schema migrations | Versioned SQL scripts in `007resort-api` | [ADR-0004](../adr/0004-schema-migrations-and-data-access.md) (proposed) |
-| Data access | EF Core for aggregates, Dapper/SQL for hot paths and reporting | [ADR-0004](../adr/0004-schema-migrations-and-data-access.md) (proposed) |
-| Local server OS | Windows Server | Spec |
+| Business API | Laravel (PHP 8.4+), running as two independently-deployed nodes (Local, Cloud) from one codebase | [ADR-0012](../adr/0012-migrate-backend-to-laravel.md) |
+| Database | MySQL 8.4 LTS, InnoDB, utf8mb4 — one instance per node | Mandated by spec, unaffected by [ADR-0012](../adr/0012-migrate-backend-to-laravel.md) |
+| Real-time | Laravel Reverb (or a Pusher-protocol-compatible broadcaster), WebSockets | [ADR-0012](../adr/0012-migrate-backend-to-laravel.md) |
+| Caching / queues / transient coordination | Redis — queues, cache, rate limiting, sync coordination. **Never** authoritative storage for money, inventory, bookings, tickets, memberships or orders | [ADR-0012](../adr/0012-migrate-backend-to-laravel.md) |
+| POS | .NET 10 WPF on Windows | [ADR-0006](../adr/0006-client-technology-choices.md) — unaffected by the backend migration |
+| Mobile | Flutter (Android) | Mandated — unaffected |
+| Admin / Booking web | Laravel (PHP 8.4+) as a UI/BFF with **no business database** | [ADR-0007](../adr/0007-php-apps-are-api-clients-without-business-data.md) — unaffected in principle; now the same language as the backend, see [22 §6](22-migration-impact-assessment.md#6-should-007resort-admin-web--007resort-booking-web-merge-into-the-backend) |
+| KDS | Browser kiosk client (TypeScript), real-time client updated for Reverb/Echo | [ADR-0006](../adr/0006-client-technology-choices.md); connection layer updated per [22](22-migration-impact-assessment.md) |
+| Schema migrations | Versioned SQL, applied via Laravel's migration runner | [ADR-0012](../adr/0012-migrate-backend-to-laravel.md), superseding the DbUp/EF Core specifics in [ADR-0004](../adr/0004-schema-migrations-and-data-access.md) (the reviewable-SQL *principle* survives; the tool is Laravel-native) |
+| Data access | Eloquent for aggregates, query builder/raw SQL for hot paths, the highest-contention updates, and reporting | Supersedes the EF Core/Dapper split in [ADR-0004](../adr/0004-schema-migrations-and-data-access.md) — same split, Laravel-native tools |
+| Local server OS | Windows Server | Spec, unaffected |
+| Cloud hosting | Linux VPS, root access | [ADR-0014](../adr/0014-cloud-node-requires-vps-supersedes-shared-hosting.md), superseding [ADR-0010](../adr/0010-cloud-hosting-platform.md) |
 
 ## 7. Cross-cutting mechanisms
 
@@ -162,8 +165,8 @@ The hotel PMS (rooms, reservations, housekeeping, key cards, folios). The facili
 | 09 | [Inventory movement model](09-inventory-movement-model.md) |
 | 10 | [Booking state model](10-booking-state-model.md) |
 | 11 | [Ticket / entitlement validation model](11-ticket-validation-model.md) |
-| 12 | [Sync strategy](12-sync-strategy.md) |
-| 13 | [Offline strategy](13-offline-strategy.md) |
+| 12 | [Sync strategy](12-sync-strategy.md) — *superseded by [ADR-0013](../adr/0013-dual-node-local-cloud-sync.md) and `sync/`* |
+| 13 | [Offline strategy](13-offline-strategy.md) — *superseded by `sync/`* |
 | 14 | [API module map](14-api-module-map.md) |
 | 15 | [API conventions and initial endpoint map](15-api-conventions-and-endpoint-map.md) |
 | 16 | [Deployment topology](16-deployment-topology.md) |
@@ -171,3 +174,14 @@ The hotel PMS (rooms, reservations, housekeeping, key cards, folios). The facili
 | 18 | [Testing strategy](18-testing-strategy.md) |
 | 19 | [Implementation milestones](19-milestones.md) |
 | 20 | [Ambiguities and open questions](20-open-questions.md) |
+| 21 | [Existing system audit](21-existing-system-audit.md) (Laravel/dual-node migration) |
+| 22 | [Migration impact assessment](22-migration-impact-assessment.md) |
+| 23 | [Domain authority matrix](23-domain-authority-matrix.md) |
+| 24 | [Failure mode matrix](24-failure-mode-matrix.md) |
+| 25 | [VPS production deployment spec (Cloud node)](25-vps-production-deployment.md) |
+| 26 | [Windows Local Server deployment spec (Local node)](26-windows-local-server-deployment.md) |
+| — | [Synchronization event catalogue](sync/event-catalogue.md) |
+| — | [Outbox/inbox design](sync/outbox-inbox-design.md) |
+| — | [Booking authority & offline allocation](sync/booking-authority-and-offline-allocation.md) |
+| — | [Heartbeat / node health](sync/heartbeat-and-node-health.md) |
+| — | [Conflict resolution matrix](sync/conflict-resolution-matrix.md) |

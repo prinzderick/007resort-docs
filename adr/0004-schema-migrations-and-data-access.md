@@ -1,8 +1,10 @@
 # ADR-0004: Versioned SQL migrations owned by 007resort-api; EF Core + Dapper split for data access
 
-Status: Proposed (see [open question Q3](../architecture/20-open-questions.md))
+Status: Partially superseded by [ADR-0012](0012-migrate-backend-to-laravel.md)
 Date: 2026-09-22
 Deciders: Architecture review (pending)
+
+> **Partially superseded.** The *principle* — reviewable, versioned SQL migrations; a split between an ORM for aggregates and raw SQL for high-contention/reporting paths — is carried forward and reaffirmed by [ADR-0012](0012-migrate-backend-to-laravel.md). The specific *tools* named below (DbUp, EF Core, Dapper) are C#/.NET-specific and don't apply now that the backend is Laravel; their Laravel-native equivalents (Laravel's own migration runner, Eloquent, the query builder/raw SQL) are used instead. Kept below as the historical record — the `V0001__initial_schema.sql` migration this ADR produced was verified against real MySQL 8.4 and is reused as-is by the Laravel migration runner (see [21 — Existing System Audit](../architecture/21-existing-system-audit.md)).
 
 ## Problem
 

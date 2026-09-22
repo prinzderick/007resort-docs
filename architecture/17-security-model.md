@@ -49,6 +49,17 @@ Permission-based, scoped, described fully in [06](06-roles-permissions.md). Ever
 
 Covered in [16 §1](16-deployment-topology.md#1-on-site): logical VLAN separation (SERVER, POS/OPERATIONS, CCTV, STAFF, GUEST), Guest Wi-Fi isolated from all operational systems, CCTV pre-existing and isolated ([spec §21](../spec/)).
 
+## 7.1 Local/Cloud node-to-node security
+
+Added per [ADR-0013](../adr/0013-dual-node-local-cloud-sync.md):
+
+- The sync channel (`/api/v1/sync/*`, [Outbox/Inbox Design](sync/outbox-inbox-design.md)) is HTTPS/TLS, always outbound-initiated by whichever node has the event — Cloud never opens a connection to Local ([ADR-0005](../adr/0005-site-authoritative-local-first-with-outbound-sync.md)).
+- **Node authentication**: each node presents a long-lived node credential (a bearer token or mutual-TLS client certificate — exact mechanism decided at implementation time, but a credential distinct from any staff/customer/device credential is required) issued at commissioning. This credential identifies "this request came from the genuine Local node of 007 Resort & Spa," separate from any staff session that might also be embedded in a request's audit trail.
+- **Rotation**: the node credential is rotatable without a deployment (stored in `.env`/secrets, not compiled in), and rotation is a documented runbook step in `007resort-infrastructure`, not an ad hoc action.
+- **Replay protection**: `event_id` uniqueness (the same idempotency mechanism used for business correctness, [Outbox/Inbox Design](sync/outbox-inbox-design.md) §3) doubles as replay protection for the sync channel specifically — a captured-and-replayed sync request has no effect beyond the first application.
+- **Rate limiting**: the sync inbox endpoint is rate-limited per node credential (via Redis, [ADR-0012](../adr/0012-migrate-backend-to-laravel.md)) to bound the damage of a compromised or malfunctioning peer, distinct from the public-facing rate limits on customer/staff-facing endpoints.
+- **Audit**: every applied sync event is traceable to its `source_node` and `event_id` in the receiving node's own audit trail — a synced change is never indistinguishable from a locally-originated one in the audit log.
+
 ## 8. Hardware abstraction and vendor neutrality
 
 Printers, NFC readers, barcode/QR scanners, biometric attendance and payment integrations sit behind interfaces (`IReceiptPrinter`, `INfcReader`, `IBarcodeScanner`, a biometric adapter, a payment provider adapter) so no business logic is coupled to one manufacturer, and a vendor swap does not touch application logic ([spec §22](../spec/)).

@@ -15,6 +15,15 @@ _Last updated: 2026-09-22_
   - `007resort-docs` — this repository
 - **Phase 0 — architecture documentation**: full architecture set (`architecture/01`–`20`), 8 ADRs, 4 workflow diagrams, and a draft schema for the highest-risk tables — submitted for review as [PR #1](https://github.com/prinzderick/007resort-docs/pull/1) (open, awaiting approval).
 - **Rename**: the project (working name "Otueke") was renamed to **007 Resort & Spa** across all 8 repositories, code identifiers (`R007`/`r007`), and documentation. See `git log` on each repo for the rename commits.
+- **Branch protection**: `main` is now protected on all 8 repos (pull request required with 1 approval, no force-pushes, no deletions, conversations must be resolved before merge), per [spec §1](../spec/) / [spec §22](../spec/) ("protect main from accidental direct development once initial scaffolding has been committed").
+
+## ⚠️ Temporary: repositories are currently PUBLIC
+
+All 8 repositories were switched from private to public on 2026-09-22 **at your explicit instruction**, solely because GitHub's branch-protection API (both classic protection and the newer rulesets) refuses to operate on private repositories under this account's current plan ("Upgrade to GitHub Pro or make this repository public"). A secret scan of every tracked file was run immediately before flipping visibility and found nothing sensitive (only Laravel's default `env('AWS_SECRET_ACCESS_KEY')`-style config references, no real values).
+
+This is a deliberate, acknowledged deviation from the client specification's "ALL repositories MUST be private" / "Do not make any repository public" requirement, made as a stated trade-off to get branch protection working now. **Remember to revert this** — either:
+- switch the repos back to private (branch protection will then need to be re-applied via GitHub's web UI's org-level free tier if applicable, or dropped), or
+- upgrade the `prinzderick` account to GitHub Pro (or move the repos to a GitHub Organization, which gets branch protection on private repos on the free tier) and then switch back to private with protection intact.
 
 ## In progress
 

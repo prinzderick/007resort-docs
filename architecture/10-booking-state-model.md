@@ -40,7 +40,7 @@ stateDiagram-v2
 sequenceDiagram
   participant U1 as Customer A (booking-web)
   participant U2 as Reception (POS)
-  participant API as otueke-api
+  participant API as 007resort-api
   participant DB as MySQL
   U1->>API: POST /bookings/hold {resource, slot}
   U2->>API: POST /bookings/hold {resource, slot}

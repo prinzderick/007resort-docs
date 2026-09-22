@@ -4,7 +4,7 @@
 sequenceDiagram
   actor St as Staff member
   participant Gate as Biometric terminal (Main Gate)
-  participant API as otueke-api
+  participant API as 007resort-api
   actor Sup as Supervisor
   actor Dev as Terminal/tablet
 

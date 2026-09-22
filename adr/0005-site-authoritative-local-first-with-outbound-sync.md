@@ -10,7 +10,7 @@ The property must keep operating — payments, orders, KDS, ticket validation, s
 
 ## Decision
 
-The on-site MySQL database is the system of record for on-site operational data. The site's `otueke-api` instance opens an **outbound-only**, mutually authenticated connection to the cloud to push its operational history and pull commands (online bookings, remote configuration edits). No inbound connection from the internet ever reaches the site server or database. See [01 §3](../architecture/01-architecture-overview.md#3-system-context) and [12 — Sync strategy](../architecture/12-sync-strategy.md).
+The on-site MySQL database is the system of record for on-site operational data. The site's `007resort-api` instance opens an **outbound-only**, mutually authenticated connection to the cloud to push its operational history and pull commands (online bookings, remote configuration edits). No inbound connection from the internet ever reaches the site server or database. See [01 §3](../architecture/01-architecture-overview.md#3-system-context) and [12 — Sync strategy](../architecture/12-sync-strategy.md).
 
 ## Alternatives considered
 

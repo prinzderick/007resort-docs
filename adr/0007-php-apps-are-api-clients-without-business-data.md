@@ -6,11 +6,11 @@ Deciders: Architecture review (pending)
 
 ## Problem
 
-Laravel ships with strong conventions for owning its own database (migrations, Eloquent models, a `users` table). Left unchecked, that convention pulls `otueke-admin-web` and `otueke-booking-web` toward maintaining their own copies of business data — exactly what the specification forbids ("PHP must not independently perform core business operations", "other repositories must not maintain competing database schemas" — [spec §3, §9](../spec/)).
+Laravel ships with strong conventions for owning its own database (migrations, Eloquent models, a `users` table). Left unchecked, that convention pulls `007resort-admin-web` and `007resort-booking-web` toward maintaining their own copies of business data — exactly what the specification forbids ("PHP must not independently perform core business operations", "other repositories must not maintain competing database schemas" — [spec §3, §9](../spec/)).
 
 ## Decision
 
-Both Laravel applications carry **no business tables**. Framework-only concerns (sessions, cache, queue) use file/sync drivers, not a database, in Phase 1. All operational reads and writes go through `otueke-api`'s HTTP endpoints via a thin `OtuekeApiClient` service. Where reporting query volume genuinely does not fit comfortably through the REST API, the API exposes **read-only SQL views** and issues the PHP app a read-only, view-restricted database credential — never write access, and never a join against raw ledger tables ([04 §4](../architecture/04-database-schema.md#4-reporting-access)).
+Both Laravel applications carry **no business tables**. Framework-only concerns (sessions, cache, queue) use file/sync drivers, not a database, in Phase 1. All operational reads and writes go through `007resort-api`'s HTTP endpoints via a thin `R007ApiClient` service. Where reporting query volume genuinely does not fit comfortably through the REST API, the API exposes **read-only SQL views** and issues the PHP app a read-only, view-restricted database credential — never write access, and never a join against raw ledger tables ([04 §4](../architecture/04-database-schema.md#4-reporting-access)).
 
 ## Alternatives considered
 
@@ -20,6 +20,6 @@ Both Laravel applications carry **no business tables**. Framework-only concerns 
 
 ## Consequences
 
-- `otueke-admin-web` and `otueke-booking-web` scaffolding (already committed) removes the default Laravel `users` migration/model rather than adapting it, since there is no local user table.
+- `007resort-admin-web` and `007resort-booking-web` scaffolding (already committed) removes the default Laravel `users` migration/model rather than adapting it, since there is no local user table.
 - Every mutating admin action (approve a refund, change a price, suspend a membership) is implemented as a call to an API endpoint, keeping authorization and audit centralized even for actions initiated from the PHP UI.
 - If reporting load later requires more than views can comfortably serve, the fix is a dedicated reporting replica or store, decided by a new ADR — not by quietly granting PHP write access.

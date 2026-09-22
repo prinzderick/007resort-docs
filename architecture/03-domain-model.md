@@ -8,7 +8,7 @@ Almost every operational record carries `organization_id` and `site_id`, plus `f
 
 ```mermaid
 flowchart TD
-  O[Organization<br/>Tripli / owner entity] --> S[Site<br/>'Otueke property']
+  O[Organization<br/>Tripli / owner entity] --> S[Site<br/>'007 Resort & Spa property']
   S --> F[Facility Unit<br/>Restaurant, Indoor Club, Sports Arena ...]
   F --> F2[Child Facility Unit<br/>Football, Lawn Tennis, Basketball]
   F --> OP[Operating Point<br/>counter, table area, KDS station, gate, store location]

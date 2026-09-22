@@ -15,7 +15,7 @@ Status: **DRAFT, awaiting review**
 | Filtering/sorting | `?filter[field]=value`, `?sort=-createdAt,field` — documented per endpoint, not a generic passthrough to SQL |
 | Idempotency | `Idempotency-Key` header **required** on every non-idempotent mutating request (`POST` that creates, and any endpoint explicitly marked mutating); missing header on a marked endpoint is a `400` |
 | Concurrency | `ETag` / `If-Match` (backed by `row_version`) on updates to mutable aggregates; mismatch is `409 Conflict` with `problem.code = concurrency_conflict` |
-| DTOs | Contracts in `Otueke.Contracts`; entities are never serialized directly |
+| DTOs | Contracts in `R007.Contracts`; entities are never serialized directly |
 | Correlation | `X-Correlation-Id` accepted and echoed; generated if absent; flows into logs and traces |
 
 ## 2. Endpoint map (representative, not exhaustive — grows with the OpenAPI doc)
@@ -108,4 +108,4 @@ Status: **DRAFT, awaiting review**
 | `POST /api/v1/sync/push` | Site → Cloud batch |
 | `GET /api/v1/sync/pull` | Cloud → Site commands |
 
-This list will grow as modules are implemented; the generated OpenAPI document is the source of truth once `otueke-api` exists.
+This list will grow as modules are implemented; the generated OpenAPI document is the source of truth once `007resort-api` exists.

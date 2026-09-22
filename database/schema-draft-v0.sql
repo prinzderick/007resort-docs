@@ -1,4 +1,4 @@
--- Otueke IFOP — draft schema for design review (NOT a migration; see database/README.md)
+-- 007 Resort & Spa IFOP — draft schema for design review (NOT a migration; see database/README.md)
 -- MySQL 8.4, InnoDB, utf8mb4. Only the highest-risk tables are modeled here in full;
 -- see architecture/03-domain-model.md and architecture/04-database-schema.md for the complete table list.
 
@@ -336,7 +336,7 @@ CREATE TABLE audit_log (
 ) ENGINE=InnoDB;
 
 -- Application DB user grants (documented here; applied by deployment scripts, not by this file):
---   REVOKE UPDATE, DELETE ON otueke.audit_log FROM 'otueke_app'@'%';
---   REVOKE UPDATE, DELETE ON otueke.stock_movement FROM 'otueke_app'@'%';
---   REVOKE UPDATE, DELETE ON otueke.redemption FROM 'otueke_app'@'%';
---   REVOKE UPDATE, DELETE ON otueke.payment, otueke.provider_event FROM 'otueke_app'@'%';
+--   REVOKE UPDATE, DELETE ON r007.audit_log FROM 'r007_app'@'%';
+--   REVOKE UPDATE, DELETE ON r007.stock_movement FROM 'r007_app'@'%';
+--   REVOKE UPDATE, DELETE ON r007.redemption FROM 'r007_app'@'%';
+--   REVOKE UPDATE, DELETE ON r007.payment, r007.provider_event FROM 'r007_app'@'%';

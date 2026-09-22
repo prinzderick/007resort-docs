@@ -3,7 +3,7 @@
 ```mermaid
 sequenceDiagram
   actor P as Procurement / Storekeeper
-  participant API as otueke-api
+  participant API as 007resort-api
   actor F as Facility POS/workstation
   actor M as Manager
 

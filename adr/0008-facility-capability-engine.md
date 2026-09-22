@@ -20,6 +20,6 @@ Model facility behaviour as data: a fixed catalog of `capability_type`s (POS, TI
 
 ## Consequences
 
-- Adding a new facility, or changing an existing one's behaviour, is a configuration change in `otueke-admin-web`, not a deployment.
+- Adding a new facility, or changing an existing one's behaviour, is a configuration change in `007resort-admin-web`, not a deployment.
 - New capability *types* (a genuinely new kind of behaviour, not a new facility) still require an API/schema change — this is a deliberate line: the set of *possible* behaviours is a controlled vocabulary, the assignment of behaviours to facilities is not.
 - The future hotel module is expected to introduce new capability types (e.g. `ROOM_INVENTORY`, `HOUSEKEEPING`) rather than a parallel facility model, keeping [03 §5](../architecture/03-domain-model.md#5-future-hotel-pms-fit) achievable.

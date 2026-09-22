@@ -61,7 +61,7 @@ stateDiagram-v2
 Two classes of conflict:
 
 1. **Append-only facts** (orders, payments, movements, redemptions): these are never edited after creation, so there is nothing to conflict on — they just arrive and are inserted. The site's `slot_allocation`/`entitlement_item` uniqueness/quantity constraints are the actual truth; if an online booking and a Reception booking raced for the same slot, they raced **against the same site database**, not two independent copies (bookings are always written at the site — see [10](10-booking-state-model.md), §3) — so there is no cross-node booking conflict to resolve, by construction.
-2. **Mutable configuration** (staff, roles, prices, facility config): last-writer-wins is **not** used. Each editable row carries a `version` counter; a remote command that targets a stale `version` is rejected into `sync_conflict` for a human (Manager/IT) to resolve in `otueke-admin-web`, rather than silently overwritten. This matches the spec's explicit sync states including `CONFLICT` ([spec §20](../spec/)).
+2. **Mutable configuration** (staff, roles, prices, facility config): last-writer-wins is **not** used. Each editable row carries a `version` counter; a remote command that targets a stale `version` is rejected into `sync_conflict` for a human (Manager/IT) to resolve in `007resort-admin-web`, rather than silently overwritten. This matches the spec's explicit sync states including `CONFLICT` ([spec §20](../spec/)).
 
 ## 6. Failure handling
 

@@ -21,9 +21,9 @@ A single platform that runs a multi-facility leisure property: payments, POS, ho
 ```mermaid
 flowchart TB
   subgraph Cloud["Cloud (managed hosting)"]
-    BW["otueke-booking-web<br/>public site + booking portal"]
-    AWc["otueke-admin-web<br/>(remote instance)"]
-    CAPI["otueke-api<br/>Cloud mode"]
+    BW["007resort-booking-web<br/>public site + booking portal"]
+    AWc["007resort-admin-web<br/>(remote instance)"]
+    CAPI["007resort-api<br/>Cloud mode"]
     CDB[("MySQL 8.4<br/>cloud")]
     PSP["Payment provider(s)"]
     BW --> CAPI
@@ -32,13 +32,13 @@ flowchart TB
     PSP -- webhooks --> CAPI
   end
 
-  subgraph Site["Otueke property (on-site)"]
-    SAPI["otueke-api<br/>Site mode (Windows service)"]
+  subgraph Site["007 Resort & Spa property (on-site)"]
+    SAPI["007resort-api<br/>Site mode (Windows service)"]
     SDB[("MySQL 8.4<br/>site: system of record")]
-    AWs["otueke-admin-web<br/>(local instance)"]
-    POS["10 x otueke-pos-desktop"]
-    TAB["18 x otueke-mobile tablets"]
-    KDS["4 x otueke-kds"]
+    AWs["007resort-admin-web<br/>(local instance)"]
+    POS["10 x 007resort-pos-desktop"]
+    TAB["18 x 007resort-mobile tablets"]
+    KDS["4 x 007resort-kds"]
     HW["Printers / NFC / scanners /<br/>biometric terminal"]
     NAS[("Backup NAS")]
     SAPI --> SDB
@@ -57,7 +57,7 @@ The site server is **never** reachable from the internet. The site opens an outb
 
 ## 4. Deployment modes of the API
 
-Both deployments run the same `otueke-api` binary. `Otueke:DeploymentMode` switches modules on or off:
+Both deployments run the same `007resort-api` binary. `R007:DeploymentMode` switches modules on or off:
 
 | Concern | Site mode (on-site server) | Cloud mode |
 | --- | --- | --- |
@@ -71,7 +71,7 @@ Both deployments run the same `otueke-api` binary. `Otueke:DeploymentMode` switc
 
 ## 5. Logical architecture: a modular monolith
 
-`otueke-api` is **one deployable** split into modules with hard boundaries. A module owns its tables and exposes application services. Other modules call those services, never the module's tables. ([ADR-0002](../adr/0002-modular-monolith.md))
+`007resort-api` is **one deployable** split into modules with hard boundaries. A module owns its tables and exposes application services. Other modules call those services, never the module's tables. ([ADR-0002](../adr/0002-modular-monolith.md))
 
 ```mermaid
 flowchart LR
@@ -126,7 +126,7 @@ The modules talk to each other inside one database transaction when the change m
 | Mobile | Flutter (Android) | Mandated |
 | Admin / Booking web | Laravel (PHP 8.4+) as a UI/BFF with **no business database** | [ADR-0007](../adr/0007-php-apps-are-api-clients-without-business-data.md) (proposed) |
 | KDS | Browser kiosk client (TypeScript, SignalR JS) | [ADR-0006](../adr/0006-client-technology-choices.md) (proposed) |
-| Schema migrations | Versioned SQL scripts in `otueke-api` | [ADR-0004](../adr/0004-schema-migrations-and-data-access.md) (proposed) |
+| Schema migrations | Versioned SQL scripts in `007resort-api` | [ADR-0004](../adr/0004-schema-migrations-and-data-access.md) (proposed) |
 | Data access | EF Core for aggregates, Dapper/SQL for hot paths and reporting | [ADR-0004](../adr/0004-schema-migrations-and-data-access.md) (proposed) |
 | Local server OS | Windows Server | Spec |
 

@@ -5,7 +5,7 @@ Reception handles payment for Pool, Sports Arena, Sports Store, equipment rental
 ```mermaid
 sequenceDiagram
   actor R as Reception cashier (POS)
-  participant API as otueke-api
+  participant API as 007resort-api
   actor SE as Sports Entrance tablet
   actor SS as Sports Store tablet
 

@@ -1,4 +1,4 @@
-# Contributing to otueke-docs
+# Contributing to 007resort-docs
 
 ## Branching
 

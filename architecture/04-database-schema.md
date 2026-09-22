@@ -1,6 +1,6 @@
 # 04 — Initial MySQL Schema Design
 
-Status: **DRAFT for review**. The authoritative schema and migrations will live only in `otueke-api` (`db/migrations/`). This document and [`database/schema-draft-v0.sql`](../database/schema-draft-v0.sql) are the design proposal used to review that first migration before it is written; once the review lands, `otueke-api` is the single source of truth and this file is updated to link to it rather than duplicate it.
+Status: **DRAFT for review**. The authoritative schema and migrations will live only in `007resort-api` (`db/migrations/`). This document and [`database/schema-draft-v0.sql`](../database/schema-draft-v0.sql) are the design proposal used to review that first migration before it is written; once the review lands, `007resort-api` is the single source of truth and this file is updated to link to it rather than duplicate it.
 
 ## 1. Conventions ([ADR-0003](../adr/0003-identifier-and-money-conventions.md))
 
@@ -179,7 +179,7 @@ The application DB user has `INSERT` but not `UPDATE`/`DELETE` on `audit_log`. E
 
 ## 4. Reporting access
 
-Phase 1 reporting reads directly from the operational schema through **read-only SQL views** owned by `otueke-api` (e.g. `v_facility_daily_summary`, `v_cashier_shift_report`). `otueke-admin-web` connects with a read-only, view-restricted database credential — never with write access, and never joining raw ledger tables directly (see [ADR-0007](../adr/0007-php-apps-are-api-clients-without-business-data.md)). If reporting load becomes material, a replica or a dedicated reporting store is introduced by a new ADR rather than by PHP acquiring write access.
+Phase 1 reporting reads directly from the operational schema through **read-only SQL views** owned by `007resort-api` (e.g. `v_facility_daily_summary`, `v_cashier_shift_report`). `007resort-admin-web` connects with a read-only, view-restricted database credential — never with write access, and never joining raw ledger tables directly (see [ADR-0007](../adr/0007-php-apps-are-api-clients-without-business-data.md)). If reporting load becomes material, a replica or a dedicated reporting store is introduced by a new ADR rather than by PHP acquiring write access.
 
 ## 5. Open items for the migration review
 

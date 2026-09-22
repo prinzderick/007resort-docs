@@ -5,7 +5,7 @@ Facilities: Restaurant, Indoor Club, Pool Bar, Bush Bar / Event Centre (varying 
 ```mermaid
 sequenceDiagram
   actor W as Wait staff (tablet/POS)
-  participant API as otueke-api
+  participant API as 007resort-api
   participant KDS as KDS station
   actor K as Kitchen/bar staff
   actor C as Cashier

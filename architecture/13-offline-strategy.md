@@ -34,7 +34,7 @@ flowchart TD
 
 ## 3. Terminal-level resilience (the encrypted emergency queue)
 
-Applies to `otueke-pos-desktop` and `otueke-mobile` per [spec §6, §19](../spec/):
+Applies to `007resort-pos-desktop` and `007resort-mobile` per [spec §6, §19](../spec/):
 
 - The client **never** runs pricing, tax, permission, stock, or entitlement logic locally — there is nothing to decide offline, only to queue.
 - A queued action is a **request envelope**: endpoint, method, body, a client-generated `Idempotency-Key`, and a timestamp — encrypted at rest (platform keystore-backed key; AES-256).

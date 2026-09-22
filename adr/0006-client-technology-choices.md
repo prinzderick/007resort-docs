@@ -10,8 +10,8 @@ The specification mandates C#/.NET for the Windows POS and Flutter/Dart for the 
 
 ## Decision
 
-- **POS** ([otueke-pos-desktop](../architecture/02-repository-map.md)): WPF on .NET 10. WPF is a mature, well-supported native Windows UI framework with good touchscreen support, low resource use appropriate for 10 fixed terminals of modest hardware, and native access to Windows-specific device APIs (serial/USB printers, NFC readers) without a bridging layer.
-- **KDS** ([otueke-kds](../architecture/02-repository-map.md)): a browser-based kiosk client (Vite + TypeScript, no framework), connected to the API via SignalR JavaScript client. A browser kiosk avoids installing and updating a native app on 4 fixed-purpose displays, is trivially updated by refreshing/redeploying static files, and matches "lightweight" — the client holds only a display/state-transition model, no business logic ([08](../architecture/08-order-state-model.md)).
+- **POS** ([007resort-pos-desktop](../architecture/02-repository-map.md)): WPF on .NET 10. WPF is a mature, well-supported native Windows UI framework with good touchscreen support, low resource use appropriate for 10 fixed terminals of modest hardware, and native access to Windows-specific device APIs (serial/USB printers, NFC readers) without a bridging layer.
+- **KDS** ([007resort-kds](../architecture/02-repository-map.md)): a browser-based kiosk client (Vite + TypeScript, no framework), connected to the API via SignalR JavaScript client. A browser kiosk avoids installing and updating a native app on 4 fixed-purpose displays, is trivially updated by refreshing/redeploying static files, and matches "lightweight" — the client holds only a display/state-transition model, no business logic ([08](../architecture/08-order-state-model.md)).
 
 ## Alternatives considered
 

@@ -6,15 +6,15 @@ Status: **DRAFT, awaiting review**
 
 | Repository | Levels |
 | --- | --- |
-| `otueke-api` | Unit (xUnit, domain/module logic in isolation) → Integration (`WebApplicationFactory` + Testcontainers MySQL 8.4, real schema, real transactions) → Authorization tests (every sensitive endpoint denied without permission, allowed with it, escalated to approval where configured) → Concurrency tests (§3) → Contract tests (OpenAPI snapshot diff) |
-| `otueke-pos-desktop` | Unit (business-client logic, device abstraction implementations) → Integration (against a running `otueke-api` test instance, or a contract-mocked server) → Manual/exploratory UI pass per release |
-| `otueke-mobile` | Unit (Dart) → Widget tests for critical workflows (attendant order flow, Sports Entrance result screen, Sports Store release flow) → API integration tests |
-| `otueke-admin-web` / `otueke-booking-web` | Feature tests (Pest/PHPUnit) → Authorization/policy tests → Reporting tests (view output matches expected aggregates) → API integration tests (Http::fake plus a contract-mocked server) |
-| `otueke-kds` | Routing tests (product/facility → station mapping) → State transition tests → Real-time update tests (SignalR reconnect/backfill behaviour) |
+| `007resort-api` | Unit (xUnit, domain/module logic in isolation) → Integration (`WebApplicationFactory` + Testcontainers MySQL 8.4, real schema, real transactions) → Authorization tests (every sensitive endpoint denied without permission, allowed with it, escalated to approval where configured) → Concurrency tests (§3) → Contract tests (OpenAPI snapshot diff) |
+| `007resort-pos-desktop` | Unit (business-client logic, device abstraction implementations) → Integration (against a running `007resort-api` test instance, or a contract-mocked server) → Manual/exploratory UI pass per release |
+| `007resort-mobile` | Unit (Dart) → Widget tests for critical workflows (attendant order flow, Sports Entrance result screen, Sports Store release flow) → API integration tests |
+| `007resort-admin-web` / `007resort-booking-web` | Feature tests (Pest/PHPUnit) → Authorization/policy tests → Reporting tests (view output matches expected aggregates) → API integration tests (Http::fake plus a contract-mocked server) |
+| `007resort-kds` | Routing tests (product/facility → station mapping) → State transition tests → Real-time update tests (SignalR reconnect/backfill behaviour) |
 
 ## 2. CI gating
 
-Every repository's CI runs on every push and pull request to `main`: build, lint/format check, the test levels above appropriate to that stack, and a `gitleaks` secret scan. `otueke-api` additionally runs the OpenAPI snapshot check. A red pipeline blocks merge.
+Every repository's CI runs on every push and pull request to `main`: build, lint/format check, the test levels above appropriate to that stack, and a `gitleaks` secret scan. `007resort-api` additionally runs the OpenAPI snapshot check. A red pipeline blocks merge.
 
 ## 3. Critical concurrency tests (mandatory, tracked to completion before Phase 2 sign-off)
 

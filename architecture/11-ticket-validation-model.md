@@ -41,7 +41,7 @@ Pool defaults to ticketing with `SINGLE_USE` (or `ENTRY_EXIT` where headcount tr
 sequenceDiagram
   participant S1 as Scanner 1 (Sports Entrance)
   participant S2 as Scanner 2 (Sports Entrance, second lane)
-  participant API as otueke-api
+  participant API as 007resort-api
   participant DB as MySQL
   S1->>API: POST /entitlements/{id}/redeem {action: ENTRY}
   S2->>API: POST /entitlements/{id}/redeem {action: ENTRY}

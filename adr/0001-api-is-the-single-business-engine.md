@@ -10,7 +10,7 @@ Six client applications (POS, mobile, KDS, two Laravel apps) need to share prici
 
 ## Decision
 
-`otueke-api` is the only component that decides prices, validates tickets, allocates booking slots, authorizes actions, and mutates operational data. Every client is a thin presentation layer: it renders data returned by the API and sends user intent to the API as requests. No client independently computes a price, checks a permission, or writes to a business table.
+`007resort-api` is the only component that decides prices, validates tickets, allocates booking slots, authorizes actions, and mutates operational data. Every client is a thin presentation layer: it renders data returned by the API and sends user intent to the API as requests. No client independently computes a price, checks a permission, or writes to a business table.
 
 ## Alternatives considered
 

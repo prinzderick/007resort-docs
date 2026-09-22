@@ -5,32 +5,32 @@ Status: **DRAFT, awaiting review**. See [01 §5](01-architecture-overview.md#5-l
 ## 1. Solution/project layout (proposed)
 
 ```text
-otueke-api/
+007resort-api/
   src/
-    Otueke.Api/                # Host: composition root, routing, middleware, OpenAPI
-    Otueke.SharedKernel/       # Result/Error, IClock, ids, money value objects
-    Otueke.Contracts/          # Public DTOs shared with generated clients
-    Otueke.Infrastructure/     # EF Core DbContext(s), Dapper helpers, outbox, migrations runner
+    R007.Api/                # Host: composition root, routing, middleware, OpenAPI
+    R007.SharedKernel/       # Result/Error, IClock, ids, money value objects
+    R007.Contracts/          # Public DTOs shared with generated clients
+    R007.Infrastructure/     # EF Core DbContext(s), Dapper helpers, outbox, migrations runner
     Modules/
-      Otueke.Modules.Organization/
-      Otueke.Modules.Identity/
-      Otueke.Modules.Devices/
-      Otueke.Modules.Catalog/
-      Otueke.Modules.Orders/
-      Otueke.Modules.Payments/
-      Otueke.Modules.Hospitality/      # prep tickets / KDS routing
-      Otueke.Modules.Inventory/
-      Otueke.Modules.Booking/
-      Otueke.Modules.Ticketing/
-      Otueke.Modules.Membership/
-      Otueke.Modules.Attendance/
-      Otueke.Modules.Audit/
-      Otueke.Modules.Sync/
-      Otueke.Modules.Reporting/
+      R007.Modules.Organization/
+      R007.Modules.Identity/
+      R007.Modules.Devices/
+      R007.Modules.Catalog/
+      R007.Modules.Orders/
+      R007.Modules.Payments/
+      R007.Modules.Hospitality/      # prep tickets / KDS routing
+      R007.Modules.Inventory/
+      R007.Modules.Booking/
+      R007.Modules.Ticketing/
+      R007.Modules.Membership/
+      R007.Modules.Attendance/
+      R007.Modules.Audit/
+      R007.Modules.Sync/
+      R007.Modules.Reporting/
   db/migrations/               # versioned SQL, single authoritative schema owner
   tests/
-    Otueke.UnitTests/
-    Otueke.IntegrationTests/   # WebApplicationFactory + Testcontainers MySQL
+    R007.UnitTests/
+    R007.IntegrationTests/   # WebApplicationFactory + Testcontainers MySQL
 ```
 
 Each module exposes:
@@ -39,7 +39,7 @@ Each module exposes:
 - **Its own EF Core mapping / tables** — another module never queries another module's tables directly; it calls the service, or reads a published **reporting view** for cross-cutting queries.
 - **Integration events** published to the transactional outbox (e.g. `OrderSettled`, `StockDepleted`, `EntitlementRedeemed`) that other modules or SignalR hubs subscribe to, keeping modules decoupled while staying inside one process/deployment.
 
-A module boundary is enforced by a lightweight architecture test (e.g. NetArchTest) in `Otueke.UnitTests`, failing CI if a module references another module's internals.
+A module boundary is enforced by a lightweight architecture test (e.g. NetArchTest) in `R007.UnitTests`, failing CI if a module references another module's internals.
 
 ## 2. Module responsibilities
 
@@ -65,11 +65,11 @@ A module boundary is enforced by a lightweight architecture test (e.g. NetArchTe
 
 | Hub | Path | Consumers | Purpose |
 | --- | --- | --- | --- |
-| KDS hub | `/hubs/kds?station={id}` | otueke-kds | Push new/changed prep tickets, status changes |
-| Ops hub | `/hubs/ops?facilityUnitId={id}` | otueke-pos-desktop, otueke-mobile, otueke-admin-web (dashboard) | Order/table status, booking availability changes, device status |
+| KDS hub | `/hubs/kds?station={id}` | 007resort-kds | Push new/changed prep tickets, status changes |
+| Ops hub | `/hubs/ops?facilityUnitId={id}` | 007resort-pos-desktop, 007resort-mobile, 007resort-admin-web (dashboard) | Order/table status, booking availability changes, device status |
 
 Both hubs are thin notification channels — every mutation still goes through the REST API; SignalR never carries a state-changing command.
 
 ## 4. Hosting the two deployment modes
 
-`Otueke.Api` reads `Otueke:DeploymentMode` (`Site` | `Cloud`) at startup and conditionally registers module services per [01 §4](01-architecture-overview.md#4-deployment-modes-of-the-api). This is a startup composition concern in the host project, not a fork of the codebase.
+`R007.Api` reads `R007:DeploymentMode` (`Site` | `Cloud`) at startup and conditionally registers module services per [01 §4](01-architecture-overview.md#4-deployment-modes-of-the-api). This is a startup composition concern in the host project, not a fork of the codebase.

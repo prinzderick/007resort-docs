@@ -9,7 +9,7 @@ Status: **DRAFT, awaiting review**
 | Staff, fixed POS | NFC card **+** PIN/password. Never NFC alone ([spec §16, §24](../spec/)) |
 | Staff, shared/supervisor tablets | Sign-in per checkout/session; step-up PIN for sensitive actions |
 | Staff, remote (admin-web) | Password (Argon2id hashing) + MFA (TOTP) for Owner/Manager/Accounts/IT where practical ([spec §24](../spec/)) |
-| Customers | Password or passwordless (magic link/OTP) via `otueke-booking-web`, separate identity space from staff |
+| Customers | Password or passwordless (magic link/OTP) via `007resort-booking-web`, separate identity space from staff |
 | Devices (POS/tablet/KDS) | Device registration issuing a device credential (client cert or rotating secret) bound to the device record; requests carry both the staff session and the device identity |
 | Site ↔ Cloud sync | Mutual TLS or a signed, rotating pre-shared credential issued at commissioning; never a static long-lived shared secret without rotation |
 | Payment provider webhooks | Provider signature verification; failed-signature requests are rejected and logged as a security event, never processed |
@@ -24,7 +24,7 @@ Permission-based, scoped, described fully in [06](06-roles-permissions.md). Ever
 
 - Access tokens are short-lived (JWT, ~15 min) with a rotating refresh token; refresh tokens are revocable server-side (`session` table), so "sign out everywhere" and lost-device revocation are immediate, not just a client-side token expiry.
 - Device registration can be revoked independently of staff sessions (a stolen tablet is disabled at the device level even if a valid staff session token is cached on it).
-- Session/device revocation and security events are visible to IT/Admin in `otueke-admin-web` ([spec §9, §24](../spec/)).
+- Session/device revocation and security events are visible to IT/Admin in `007resort-admin-web` ([spec §9, §24](../spec/)).
 
 ## 4. Transport and data protection
 

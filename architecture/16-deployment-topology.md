@@ -1,13 +1,13 @@
 # 16 — Deployment Topology
 
-Status: **DRAFT, awaiting review**. Hardware baseline: [spec §16](../spec/). Network design detail lives in `otueke-infrastructure/network/`.
+Status: **DRAFT, awaiting review**. Hardware baseline: [spec §16](../spec/). Network design detail lives in `007resort-infrastructure/network/`.
 
 ## 1. On-site
 
 ```mermaid
 flowchart TB
   subgraph ServerRoom["Server room (SERVER VLAN)"]
-    SRV["Local application server (Windows)<br/>otueke-api (Site mode) as a Windows service<br/>MySQL 8.4 + Redis (optional)"]
+    SRV["Local application server (Windows)<br/>007resort-api (Site mode) as a Windows service<br/>MySQL 8.4 + Redis (optional)"]
     NAS["Backup NAS"]
     UPS1["3kVA online UPS (server/core)"]
   end
@@ -52,10 +52,10 @@ flowchart TB
 ```mermaid
 flowchart LR
   subgraph CloudEnv["Cloud environment"]
-    CAPI["otueke-api (Cloud mode)<br/>container/App Service"]
+    CAPI["007resort-api (Cloud mode)<br/>container/App Service"]
     CDB[("Managed MySQL 8.4")]
-    BW["otueke-booking-web"]
-    AWc["otueke-admin-web (remote instance)"]
+    BW["007resort-booking-web"]
+    AWc["007resort-admin-web (remote instance)"]
     LB["TLS-terminating load balancer / WAF"]
   end
   Customer((Customer browser)) --> LB --> BW --> CAPI
@@ -67,17 +67,17 @@ flowchart LR
 
 - The exact managed hosting provider is **not yet selected** — the spec leaves this to "final hosting budget and operational requirements" ([spec §13](../spec/)). This topology is provider-agnostic (works on any environment offering a container/VM runtime, managed MySQL, and a TLS-terminating edge). Provider selection is tracked as an open question ([20](20-open-questions.md)).
 - The site's local MySQL is **never** exposed to the internet, directly or via port-forward; only the outbound sync/admin channel exists ([spec §20, §21](../spec/)).
-- Cloud `otueke-admin-web` and `otueke-booking-web` reach `otueke-api` (Cloud mode) over a private network path within the cloud environment, not over the public internet, where the hosting provider supports it.
+- Cloud `007resort-admin-web` and `007resort-booking-web` reach `007resort-api` (Cloud mode) over a private network path within the cloud environment, not over the public internet, where the hosting provider supports it.
 
 ## 3. Environments
 
 | Environment | Purpose | Notes |
 | --- | --- | --- |
-| `local` (developer machine) | Development | `otueke-infrastructure/compose/dev` (MySQL 8.4 + Redis) |
+| `local` (developer machine) | Development | `007resort-infrastructure/compose/dev` (MySQL 8.4 + Redis) |
 | `staging` (cloud) | Pre-production validation, training environment ([spec §19, §28](../spec/)) | Mirrors cloud topology at smaller scale |
-| `site-production` | The Otueke property | On-site server, per §1 |
+| `site-production` | The 007 Resort & Spa property | On-site server, per §1 |
 | `cloud-production` | Public site, booking, remote admin, backups | Per §2 |
 
-## 4. Commissioning checklist (summary — full runbook in `otueke-infrastructure`)
+## 4. Commissioning checklist (summary — full runbook in `007resort-infrastructure`)
 
 Confirm facility map/network outlets → install/terminate/test structured cabling and APs → prepare server room (power, cooling, rack) → install local server, MySQL, backups → configure facilities/products/roles/rules/inventory locations → deploy POS/workstations/KDS/printers/NFC/scanners/tablets → configure staff identities/NFC/attendance → configure cloud environment, website, remote admin → run data-integrity, payment, booking, ticket, offline/recovery tests → train staff → pilot selected facilities → acceptance testing, documentation, handover ([spec §19](../spec/)).

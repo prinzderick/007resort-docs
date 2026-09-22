@@ -1,4 +1,4 @@
-# ADR-0002: otueke-api is a modular monolith, not microservices
+# ADR-0002: 007resort-api is a modular monolith, not microservices
 
 Status: Proposed
 Date: 2026-09-22

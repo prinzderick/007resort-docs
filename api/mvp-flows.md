@@ -2,6 +2,8 @@
 
 Reference: [`openapi/v1.yaml`](openapi/v1.yaml). All calls below are relative to `/api/v1`, carry `X-Device-Token` (except where noted), and every `POST`/`PUT`/`DELETE` also carries a fresh `Idempotency-Key`. Ids in examples are abbreviated.
 
+Offline note: `POST /orders`, `POST /orders/{id}/lines`, `POST /tabs` and payment tenders accept an optional client-generated UUIDv7 `id` and `clientCreatedAt`, so steps 9 to 18 below can be created offline and replayed later in order (same id and body replays safely, a different body is `409 concurrency_conflict`). See the README offline guidance.
+
 ## Flow A — Attendant: table order to payment
 
 | # | Actor | Call | Result / notes |
@@ -15,7 +17,7 @@ Reference: [`openapi/v1.yaml`](openapi/v1.yaml). All calls below are relative to
 | 7 | App | `GET /tables?facilityId=` | Table map |
 | 8 | App | Connect Reverb; `POST /broadcasting/auth` for `private-facility.{id}.orders` and `private-device.{id}` | See [`realtime.md`](realtime.md) |
 | 9 | Attendant | `POST /tables/{tableId}/open` | Table OCCUPIED |
-| 10 | Attendant | `POST /orders` `{facilityId, tableId, channel:"DINE_IN", lines:[...]}` | `201` DRAFT order, `ETag` |
+| 10 | Attendant | `POST /orders` `{id?, clientCreatedAt?, facilityId, tableId, channel:"DINE_IN", lines:[...]}` | `201` DRAFT order, `ETag` |
 | 11 | Attendant | `POST /orders/{id}/lines` (optional) / `DELETE /orders/{id}/lines/{lineId}` (optional), with `If-Match` | Edit while DRAFT |
 | 12 | Attendant | `POST /orders/{id}/send` with `If-Match` | SENT; PrepTickets created; events `prep-ticket.created`, `order.updated` |
 | 13 | Kitchen (KDS) | `POST /auth/staff/login`, then `GET /kds/stations?facilityId=`, `GET /kds/stations/{stationId}/tickets`; subscribe `private-kds.station.{stationId}` | Live board |

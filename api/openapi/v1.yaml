@@ -14,6 +14,7 @@ info:
     - Lists are cursor paginated: `{ "items": [], "nextCursor": null }`.
     - Permissions are shown as `x-permission` on each operation; clients gate UI on the `permissions` array from login, never on role names.
     - Sensitive actions (void, adjustment, refund, reversal, stock adjustment) return `202` with `ApprovalOutcome` when supervisor approval is required, or accept an `X-Step-Up-Token` for inline supervisor authorisation.
+    - Offline creates: `POST /orders`, `POST /orders/{id}/lines`, `POST /tabs` and each tender of `POST /payments` accept an optional client-supplied UUIDv7 `id` (unique per site) plus informational `clientCreatedAt`. Same id and same body replays the original result; same id with a different body is `409 concurrency_conflict`.
   license:
     name: Proprietary
     identifier: LicenseRef-Proprietary
@@ -6129,6 +6130,16 @@ components:
         notes:
           type: string
           maxLength: 255
+        id:
+          type: string
+          format: uuid
+          description: OPTIONAL client-supplied UUIDv7, scoped per site. Server uses it if valid and unused. Replay with same
+            id and same body returns the original resource (no duplicate); same id with a different body returns 409 concurrency_conflict;
+            a non-UUIDv7 value returns 422 validation_failed. For a line this becomes the order line id.
+        clientCreatedAt:
+          type: string
+          format: date-time
+          description: OPTIONAL informational client clock (ISO-8601 UTC). Server keeps its own createdAt.
       required:
       - productId
       - quantity
@@ -6154,6 +6165,16 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/OrderLineInput'
+        id:
+          type: string
+          format: uuid
+          description: OPTIONAL client-supplied UUIDv7, scoped per site. Server uses it if valid and unused. Replay with same
+            id and same body returns the original resource (no duplicate); same id with a different body returns 409 concurrency_conflict;
+            a non-UUIDv7 value returns 422 validation_failed.
+        clientCreatedAt:
+          type: string
+          format: date-time
+          description: OPTIONAL informational client clock (ISO-8601 UTC). Server keeps its own createdAt.
       required:
       - facilityId
     SendOrderRequest:
@@ -6269,6 +6290,16 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Uuid'
+        id:
+          type: string
+          format: uuid
+          description: OPTIONAL client-supplied UUIDv7, scoped per site. Server uses it if valid and unused. Replay with same
+            id and same body returns the original resource (no duplicate); same id with a different body returns 409 concurrency_conflict;
+            a non-UUIDv7 value returns 422 validation_failed.
+        clientCreatedAt:
+          type: string
+          format: date-time
+          description: OPTIONAL informational client clock (ISO-8601 UTC). Server keeps its own createdAt.
       required:
       - facilityId
     AddTabOrdersRequest:
@@ -6388,6 +6419,16 @@ components:
         tendered:
           type: string
           description: Cash handed over (CASH only); change = tendered - amount.
+        id:
+          type: string
+          format: uuid
+          description: OPTIONAL client-supplied UUIDv7, scoped per site. Server uses it if valid and unused. Replay with same
+            id and same body returns the original resource (no duplicate); same id with a different body returns 409 concurrency_conflict;
+            a non-UUIDv7 value returns 422 validation_failed. For a tender this becomes the Payment id.
+        clientCreatedAt:
+          type: string
+          format: date-time
+          description: OPTIONAL informational client clock (ISO-8601 UTC). Server keeps its own createdAt.
       required:
       - tenderType
       - amount
@@ -6420,6 +6461,10 @@ components:
             $ref: '#/components/schemas/TenderInput'
         customerName:
           type: string
+        clientCreatedAt:
+          type: string
+          format: date-time
+          description: OPTIONAL informational client clock (ISO-8601 UTC). Server keeps its own createdAt.
       required:
       - facilityId
       - allocations

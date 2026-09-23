@@ -2,12 +2,14 @@
 
 Status: **DRAFT, awaiting review**. Hardware baseline: [spec §16](../spec/). Network design detail lives in `007resort-infrastructure/network/`.
 
+> **Backend/hosting update ([ADR-0012](../adr/0012-migrate-backend-to-laravel.md), [ADR-0013](../adr/0013-dual-node-local-cloud-sync.md), [ADR-0014](../adr/0014-cloud-node-requires-vps-supersedes-shared-hosting.md)):** the backend is now Laravel/PHP (not ASP.NET Core), and the Cloud node runs on a VPS with root access (not shared hosting). §1 below still describes the correct on-site network topology; the process (Windows Service) running on `SRV` is now Laravel/PHP, detailed fully in [26 — Windows Local Server Deployment Spec](26-windows-local-server-deployment.md). §2's diagram is superseded by [25 — VPS Production Deployment Spec](25-vps-production-deployment.md).
+
 ## 1. On-site
 
 ```mermaid
 flowchart TB
   subgraph ServerRoom["Server room (SERVER VLAN)"]
-    SRV["Local application server (Windows)<br/>007resort-api (Site mode) as a Windows service<br/>MySQL 8.4 + Redis (optional)"]
+    SRV["Local application server (Windows)<br/>007resort-api (Local node) — Laravel/PHP,<br/>supervised as Windows Services — see doc 26<br/>MySQL 8.4 + Redis"]
     NAS["Backup NAS"]
     UPS1["3kVA online UPS (server/core)"]
   end
@@ -49,26 +51,11 @@ flowchart TB
 
 ## 2. Cloud
 
-```mermaid
-flowchart LR
-  subgraph CloudEnv["Cloud environment (budget shared hosting to start — ADR-0010)"]
-    CAPI["007resort-api (Cloud mode)<br/>IIS / ASP.NET Core Module"]
-    CDB[("Shared-host MySQL")]
-    BW["007resort-booking-web"]
-    AWc["007resort-admin-web (remote instance)"]
-    TLS["Host-provided TLS (e.g. Let's Encrypt)"]
-  end
-  Customer((Customer browser)) --> TLS --> BW --> CAPI
-  Remote((Owner/Manager/Accounts, remote)) --> TLS --> AWc --> CAPI
-  PSP["Paystack"] -- signed webhook --> TLS --> CAPI
-  CAPI --> CDB
-  Site["Site API"] == outbound sync ==> CAPI
-```
+Superseded by [25 — VPS Production Deployment Spec](25-vps-production-deployment.md) per [ADR-0014](../adr/0014-cloud-node-requires-vps-supersedes-shared-hosting.md): the Cloud node is a Linux VPS with root access (Nginx, PHP-FPM, Laravel, MySQL 8.4, Redis, Reverb, Supervisor-managed workers), not shared hosting. The core principles below remain true regardless of hosting tier:
 
-- **Starting tier ([ADR-0010](../adr/0010-cloud-hosting-platform.md)):** a budget Windows/.NET-capable shared hosting plan (e.g. SmarterASP.NET or equivalent), chosen for cost. No dedicated load balancer/WAF or private network path at this tier — the host's own TLS and firewalling stand in for those, which is an accepted trade-off, not an oversight. Confirm the plan's MySQL version and WebSocket support before relying on either.
-- **Upgrade path:** Microsoft Azure (App Service + Azure Database for MySQL Flexible Server + Key Vault + Front Door) once traffic, secret-management needs, or DR requirements outgrow shared hosting ([ADR-0010](../adr/0010-cloud-hosting-platform.md)). This topology was written to be portable across either tier — moving up is a deployment change, not a redesign.
-- The site's local MySQL is **never** exposed to the internet, directly or via port-forward; only the outbound sync/admin channel exists ([spec §20, §21](../spec/)).
-- Cloud `007resort-admin-web` and `007resort-booking-web` reach `007resort-api` (Cloud mode) over whatever internal path the hosting tier offers (a private network path once on a full cloud platform; likely just an internal hostname/loopback on shared hosting where both run on the same box).
+- The site's local MySQL is **never** exposed to the internet, directly or via port-forward; only the outbound sync channel exists ([ADR-0005](../adr/0005-site-authoritative-local-first-with-outbound-sync.md), [ADR-0013](../adr/0013-dual-node-local-cloud-sync.md)).
+- `007resort-admin-web` (remote instance) and `007resort-booking-web` reach `007resort-api` (Cloud node) over a private/local path on the same VPS (or an internal network if later split across hosts) — never over the public internet for this internal call.
+- Online customers and remote admin/management traffic terminate at Cloud only; the property's Local node is never the public-facing backend for any of it ([ADR-0013](../adr/0013-dual-node-local-cloud-sync.md) §5).
 
 ## 3. Environments
 

@@ -4,45 +4,41 @@ _Last updated: 2026-09-22_
 
 ## Completed
 
-- **Phase 0 — repositories & scaffolding**: eight repositories created under `prinzderick`, all `007resort-*`, all with a green CI pipeline on `main`:
-  - `007resort-api` — ASP.NET Core / .NET 10 solution, modular skeleton, health/system-info endpoints, Serilog, OpenAPI, unit + integration tests
-  - `007resort-pos-desktop` — .NET 10 WPF solution, API client, offline-queue and device-abstraction interfaces with simulated implementations, tests
-  - `007resort-mobile` — Flutter/Dart app skeleton, device-mode model, API client, unit + widget tests
-  - `007resort-kds` — Vite/TypeScript kiosk client skeleton, SignalR client wiring, ticket store, tests
-  - `007resort-admin-web` — Laravel app with no local business database, `R007ApiClient`, feature tests
-  - `007resort-booking-web` — Laravel app, same conventions, public-site placeholder
-  - `007resort-infrastructure` — dev docker-compose (MySQL 8.4 + Redis), env templates, network segmentation design, runbooks (draft), PowerShell script skeletons
-  - `007resort-docs` — this repository
-- **Phase 0 — architecture documentation**: full architecture set (`architecture/01`–`20`), 11 ADRs, 4 workflow diagrams, and a draft schema for the highest-risk tables — submitted for review as [PR #1](https://github.com/prinzderick/007resort-docs/pull/1) (open, awaiting merge).
-- **Rename**: the project (working name "Otueke") was renamed to **007 Resort & Spa** across all 8 repositories, code identifiers (`R007`/`r007`), and documentation.
-- **Branch protection**: `main` is now protected on all 8 repos (pull request required with 1 approval, no force-pushes, no deletions, conversations must be resolved before merge).
-- **All open architecture questions resolved** ([architecture/20-open-questions.md](architecture/20-open-questions.md)): payment provider (Paystack, ADR-0009), cloud hosting (budget Windows/.NET shared hosting to start, Azure as the upgrade path, ADR-0010), migration tooling (DbUp, ADR-0004), booking capacity model, online booking availability policy, notification channels, API-client sharing, biometric attendance hardware (ZKTeco), and tax/VAT handling (admin-configurable, ADR-0011) — all confirmed or engineering-decided.
-- **Phase 1 — core API implemented**: [PR #1 on 007resort-api](https://github.com/prinzderick/007resort-api/pull/1) — migration (Organization/Identity/Devices/Audit tables, seeded roles/permissions), DbUp migration runner (verified against a real local MySQL 8.4 instance, not just SQLite), staff auth (Argon2id + JWT + revocable sessions), permission-based authorization (not role-name based — tested), device registration, hash-chained audit log, idempotency middleware, module-boundary architecture test. 41/41 tests passing, CI green. Not yet merged.
+- **Phase 0 — repositories & scaffolding**: eight repositories under `prinzderick`, all `007resort-*`, all tagged `pre-laravel-migration-2026-09-22` (recoverable snapshot before the architecture pivot below).
+- **Phase 0 — architecture documentation**: full architecture set (`architecture/01`–`20`), 11 ADRs, 4 workflow diagrams, draft schema — [PR #1](https://github.com/prinzderick/007resort-docs/pull/1) (open, awaiting merge).
+- **Rename**: "Otueke" → **007 Resort & Spa** across all 8 repositories, code identifiers, and documentation.
+- **Branch protection**: `main` protected on all 8 repos.
+- **All Phase-0 open architecture questions resolved**: payment provider (Paystack, [ADR-0009](adr/0009-payment-provider-selection.md)), tax/VAT handling (admin-configurable, [ADR-0011](adr/0011-tax-configuration-is-admin-settable.md)), biometric hardware (ZKTeco), and others — see [architecture/20](architecture/20-open-questions.md).
+- **Phase 1 — core API, ASP.NET Core reference implementation**: [PR #1 on 007resort-api](https://github.com/prinzderick/007resort-api/pull/1) — auth (Argon2id + JWT), permission-based authorization (tested), hash-chained audit, idempotency middleware, 41/41 tests, migration verified against real MySQL 8.4. **This PR will not be merged as ASP.NET Core** — see the architecture pivot below. It remains open, tagged, and is the behavioral reference the Laravel port must match (per-scenario parity, not just "a Laravel app exists").
+- **Architecture pivot documented** ([ADR-0012](adr/0012-migrate-backend-to-laravel.md), [ADR-0013](adr/0013-dual-node-local-cloud-sync.md), [ADR-0014](adr/0014-cloud-node-requires-vps-supersedes-shared-hosting.md)): backend changes from ASP.NET Core to **Laravel/PHP + MySQL 8.4 + Redis**; deployment becomes **dual-node** (Local: Windows Server on-property; Cloud: Linux VPS with root access, superseding the shared-hosting plan in [ADR-0010](adr/0010-cloud-hosting-platform.md)), synchronized by a transactional outbox/inbox event pattern — never raw database mirroring. Full audit, migration impact assessment, domain authority matrix, sync event catalogue, outbox/inbox design, booking authority & offline allocation strategy, heartbeat/node health spec, conflict resolution matrix, failure mode matrix, VPS deployment spec, and Windows Local Server deployment spec are all written — see [architecture/21](architecture/21-existing-system-audit.md) through [26](architecture/26-windows-local-server-deployment.md) and `architecture/sync/`.
 
 ## ⚠️ Temporary: repositories are currently PUBLIC
 
-All 8 repositories were switched from private to public on 2026-09-22 **at the owner's explicit instruction**, solely because GitHub's branch-protection API (both classic protection and the newer rulesets) refuses to operate on private repositories under this account's current plan ("Upgrade to GitHub Pro or make this repository public"). A secret scan of every tracked file was run immediately before flipping visibility and found nothing sensitive.
-
-This is a deliberate, acknowledged deviation from the client specification's "ALL repositories MUST be private" requirement, made as a stated trade-off to get branch protection working now. **Remember to revert this** — either switch back to private (dropping branch protection, or re-applying it if the plan allows), or upgrade to GitHub Pro / move to a GitHub Organization first, then switch back to private with protection intact.
+Switched from private to public on 2026-09-22 at the owner's explicit instruction, to unblock GitHub branch protection (unavailable for private repos on this account's plan). Secret-scanned clean before the flip. **Remember to revert** — private + branch protection needs GitHub Pro or an Organization.
 
 ## In progress
 
-- **Architecture review** ([PR #1](https://github.com/prinzderick/007resort-docs/pull/1)) — open, all content decided, awaiting your merge.
-- **Phase 1 core API review** ([PR #1 on 007resort-api](https://github.com/prinzderick/007resort-api/pull/1)) — open, awaiting your merge. One documented follow-up: the DbUp runner itself hasn't been exercised end-to-end against a live server (the raw migration SQL has been, directly).
+- **Architecture review** ([PR #1](https://github.com/prinzderick/007resort-docs/pull/1)) — open, awaiting merge.
+- **Phase 1 ASP.NET Core reference PR** ([007resort-api#1](https://github.com/prinzderick/007resort-api/pull/1)) — open, not merged, kept as the behavioral reference for the Laravel port (see above).
+- **Laravel migration architecture PR** ([architecture/laravel-migration branch](https://github.com/prinzderick/007resort-docs/tree/architecture/laravel-migration)) — this pivot's documentation, submitted for review before any Laravel implementation code is written, per the owner's explicit instruction not to start rewriting code until the audit and design documents exist.
 
 ## Next
 
-- Merge both open PRs.
-- Continue Phase 1 per [architecture/19](architecture/19-milestones.md), then Phase 2: Catalog, POS transactions, orders, payments (including the Paystack adapter).
+1. Owner reviews and merges the architecture PRs (Phase 0 set + this Laravel/dual-node pivot).
+2. Begin the actual Laravel implementation in `007resort-api` on a new branch, following the sequence in [22 — Migration Impact Assessment §5](architecture/22-migration-impact-assessment.md#5-recommended-sequence-maps-to-the-cutover-steps-in-the-migration-brief): scaffold → port `V0001` migration → port auth/permissions/audit/devices with parity tests against the ASP.NET Core reference → outbox/inbox + heartbeat infrastructure → Catalog/Orders/Payments → Inventory → Booking/Ticketing/Membership (incl. Booking Authority) → KDS real-time → client cutover → dual-node deployment → distributed-system test scenarios.
+3. Provision the actual VPS (owner action — billing/account) once ready to deploy Cloud for real, per [25 — VPS Production Deployment Spec](architecture/25-vps-production-deployment.md).
+4. Close the ASP.NET Core reference PR (not delete — close with a pointer) once the Laravel implementation reaches verified parity.
 
 ## Blockers
 
-- None.
+- None. VPS provisioning requires the owner's billing action when that step is reached — not a blocker today.
 
 ## Decisions
 
-- See [`adr/`](adr/) — ADR-0001 through ADR-0011. ADR-0009 (Paystack), ADR-0010 (hosting) and ADR-0011 (tax config) are `Accepted`; the rest are `Proposed`, pending your review of PR #1.
+- See [`adr/`](adr/) — ADR-0001 through ADR-0014.
+- **Superseded**: [ADR-0010](adr/0010-cloud-hosting-platform.md) (shared hosting) → superseded by [ADR-0014](adr/0014-cloud-node-requires-vps-supersedes-shared-hosting.md) (VPS). [ADR-0004](adr/0004-schema-migrations-and-data-access.md) (DbUp/EF Core specifics) → partially superseded by [ADR-0012](adr/0012-migrate-backend-to-laravel.md) (principle carried forward, tools now Laravel-native).
+- **New, Accepted**: [ADR-0012](adr/0012-migrate-backend-to-laravel.md) (Laravel backend), [ADR-0013](adr/0013-dual-node-local-cloud-sync.md) (dual-node sync), [ADR-0014](adr/0014-cloud-node-requires-vps-supersedes-shared-hosting.md) (VPS for Cloud).
 
 ## Open questions
 
-- None remaining — see [`architecture/20-open-questions.md`](architecture/20-open-questions.md) for the full resolution record.
+- None blocking — see [architecture/20](architecture/20-open-questions.md) for the Phase 0 record. The Laravel/dual-node pivot introduces no new _open_ questions; all its design decisions are made (see ADRs 12–14 and `architecture/sync/`).

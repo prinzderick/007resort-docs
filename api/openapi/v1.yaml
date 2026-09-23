@@ -5094,16 +5094,32 @@ components:
             kds: 0.1.0
         vatEnabled:
           type: boolean
+        realtime:
+          type: object
+          properties:
+            scheme:
+              type: string
+              enum:
+              - ws
+              - wss
+            host:
+              type: string
+            port:
+              type: integer
+            appKey:
+              type: string
+              description: Public Reverb app key.
+          required:
+          - scheme
+          - host
+          - port
+          - appKey
       required:
       - service
       - apiVersion
       - deploymentMode
-      - nodeId
       - serverTime
-      - timezone
       - currency
-      - minClientVersion
-      - vatEnabled
     Health:
       type: object
       properties:

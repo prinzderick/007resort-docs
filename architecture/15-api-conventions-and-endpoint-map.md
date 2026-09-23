@@ -2,6 +2,8 @@
 
 Status: **DRAFT, awaiting review**
 
+> **Contract of record:** the endpoint list below is illustrative. The authoritative, versioned contract is [`api/openapi/v1.yaml`](../api/openapi/v1.yaml), with realtime events in [`api/realtime.md`](../api/realtime.md) and the demo call sequences in [`api/mvp-flows.md`](../api/mvp-flows.md). Where this page and the OpenAPI file differ, the OpenAPI file wins.
+
 ## 1. Conventions
 
 | Concern | Rule |
@@ -108,4 +110,4 @@ Status: **DRAFT, awaiting review**
 | `POST /api/v1/sync/push` | Site → Cloud batch |
 | `GET /api/v1/sync/pull` | Cloud → Site commands |
 
-This list will grow as modules are implemented; the generated OpenAPI document is the source of truth once `007resort-api` exists.
+This list is superseded by [`api/openapi/v1.yaml`](../api/openapi/v1.yaml), which is the source of truth (the backend implements it and validates against it in contract tests). Realtime uses Laravel Reverb rather than SignalR, see [`api/realtime.md`](../api/realtime.md); sync uses `POST /sync/inbox` and `GET /sync/pull`.

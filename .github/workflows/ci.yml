@@ -20,6 +20,16 @@ jobs:
         with:
           globs: "**/*.md"
 
+  openapi-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Lint OpenAPI contract
+        run: npx -y @redocly/cli@latest lint api/openapi/v1.yaml
+
   secret-scan:
     runs-on: ubuntu-latest
     permissions:

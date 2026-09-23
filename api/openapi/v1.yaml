@@ -201,8 +201,8 @@ paths:
               examples:
                 ok:
                   value:
-                    accessToken: eyJ0eXAiOiJKV1QiLCJhbGciOi...
-                    refreshToken: rt_2f9c7d...
+                    accessToken: <access-token>
+                    refreshToken: <refresh-token>
                     expiresInSeconds: 900
                     staff:
                       id: 0192f6a0-0000-7000-8000-000000000401
@@ -247,7 +247,7 @@ paths:
             examples:
               r:
                 value:
-                  refreshToken: rt_2f9c7d...
+                  refreshToken: <refresh-token>
       responses:
         '200':
           description: Success
@@ -3966,7 +3966,7 @@ paths:
                 e:
                   value:
                     id: 0192f6a0-0000-7000-8000-000000000801
-                    qrToken: ent_v1.eyJ...sig
+                    qrToken: <qr-token>
                     status: ACTIVE
                     orderId: 0192f6a0-0000-7000-8000-000000000601
                     bookingId: null

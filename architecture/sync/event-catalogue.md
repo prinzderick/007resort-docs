@@ -55,6 +55,15 @@ Status: **DRAFT, awaiting review**. Companion to [ADR-0013](../../adr/0013-dual-
 | `StaffRosterUpdated` | staff/role_assignment | domain, changed fields, new version | Same version-checked apply as configuration |
 | `HeartbeatAck` | — | cloud's view of local's last-known state | Diagnostic only, not a business event |
 
+## Events originated at either node (website CMS content)
+
+Website content (settings, home blocks, pages, blog, events, gallery, media) is authoritative on the node where an editor edits it (normally Cloud, where the website reads). The API module `app/Domain/Cms` writes these to the outbox in the change's transaction when `CMS_SYNC_EMIT=true` (default off until the receiving appliers exist; an event type without an applier is stored `FAILED` on the peer). Contract: `007resort-api` `docs/CMS_API.md` section 7. Newsletter subscribers and contact messages originate on the website (Cloud) and are not synced to Local by default.
+
+| Event | Entity | Payload highlights | Consumed for |
+| --- | --- | --- | --- |
+| `CmsContentPublished` | `cms_page`, `cms_post`, `cms_event`, `cms_gallery_album`, `cms_home_section`, `cms_setting` | `entity`, `id`, `action` (`create`, `update`, `publish`, `unpublish`, `archive`, `delete`), `snapshot` (admin representation) | Version-checked upsert on the peer (same rule as `ConfigurationUpdated`, `entity_version` = `row_version`, last writer wins) |
+| `CmsMediaUploaded` | `cms_media` | `id`, `path`, `sha256`, `width`, `height`, `mimeType`, `alt`, `credit`, `sourceUrl`, `tags`, `variants[]` | Peer fetches the binary from the origin's public media URL (verifying `sha256`) or from shared object storage, then registers the row |
+
 ## Rules that apply to every event in this catalogue
 
 1. **Idempotent by `event_id`.** A receiver that has already applied `event_id` X treats a redelivery as a no-op and still acknowledges it (so the sender can mark it `SYNCED` and stop retrying).
